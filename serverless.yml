@@ -1,0 +1,223 @@
+service: hi
+
+frameworkVersion: '3'
+
+custom:
+  origin: "http://gridsomehossting.s3-website-us-east-1.amazonaws.com"
+  setting:
+    USER_TABLE: usersTable
+provider:
+  name: aws
+  runtime: nodejs14.x
+  region: us-east-1
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:DescribeTable
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource:
+        - 'arn:aws:dynamodb:${self:provider.region}:*:table/${self:custom.settings.USER_TABLE}'
+
+functions:
+  hello:
+    handler: handler.hello
+  login:
+    handler: apps/user/router/login.handler
+    events:
+      - http:
+          path: login
+          method: post
+          cors:
+            origin: ${self:custom.origin}
+            allowCredentials: true
+  register:
+    handler: apps/user/router/register.handler
+    events:
+      - http:
+          path: register
+          method: post
+          cors:
+            origin: ${self:custom.origin}
+            allowCredentials: true
+#product
+  createproduct:
+    handler:
+      - apps/product/router/create.handler
+    middleware:
+      pre:
+        - middleware/authenication.isAuth
+    events:
+      - http:
+          path: product/create
+          method: post
+          cors:
+            origin: ${self:custom.origin}
+            allowCredentials: true
+  updateproduct:
+    handler:
+      - apps/product/router/update.handler
+    middleware:
+      pre:
+        - middleware/authenication.isAuth
+    events:
+      - http:
+          path: product/update/{id}
+          method: put
+          cors:
+            origin: ${self:custom.origin}
+            allowCredentials: true
+  deleteproduct:
+    handler:
+      - apps/product/router/delete.handler
+    middleware:
+      pre:
+        - middleware/authenication.isAuth
+    events:
+      - http:
+          path: product/delete/{id}
+          method: put
+          cors:
+            origin: ${self:custom.origin}
+            allowCredentials: true
+  getproduct:
+    handler:
+      - apps/product/router/get.handler
+    events:
+      - http:
+          path: product/get/{id}
+          method: get
+          cors:
+            origin: ${self:custom.origin}
+            allowCredentials: true
+  getallproduct:
+    handler:
+      - apps/product/router/getAll.handler
+    events:
+      - http:
+          path: product/getAll
+          method: get
+          cors:
+            origin: ${self:custom.origin}
+            allowCredentials: true
+#event
+  createevent:
+    handler:
+      - apps/event/router/create.handler
+    middleware:
+      pre:
+        - middleware/authenication.isAuth
+    events:
+      - http:
+          path: event/create
+          method: post
+          cors:
+            origin: ${self:custom.origin}
+            allowCredentials: true
+  updateevent:
+    handler:
+      - apps/event/router/update.handler
+    middleware:
+      pre:
+        - middleware/authenication.isAuth
+    events:
+      - http:
+          path: event/update/{id}
+          method: put
+          cors:
+            origin: ${self:custom.origin}
+            allowCredentials: true
+  deleteevent:
+    handler:
+      - apps/event/router/delete.handler
+    middleware:
+      pre:
+        - middleware/authenication.isAuth
+    events:
+      - http:
+          path: event/delete/{id}
+          method: put
+          cors:
+            origin: ${self:custom.origin}
+            allowCredentials: true
+  getevent:
+    handler:
+      - apps/event/router/get.handler
+    events:
+      - http:
+          path: event/get/{id}
+          method: get
+          cors:
+            origin: ${self:custom.origin}
+            allowCredentials: true
+  getallevent:
+    handler:
+      - apps/event/router/getAll.handler
+    events:
+      - http:
+          path: event/getAll
+          method: get
+          cors:
+            origin: ${self:custom.origin}
+            allowCredentials: true
+
+#deal
+  createdeal:
+    handler:
+      - apps/deal/router/createDeal.handler
+    middleware:
+      pre:
+        - middleware/authenication.isAuth
+    events:
+      - http:
+          path: deal/create
+          method: post
+          cors:
+            origin: ${self:custom.origin}
+            allowCredentials: true
+  usergetdeal:
+    handler:
+      - apps/deal/router/userGet.handler
+    middleware:
+      pre:
+        - middleware/authenication.isAuth
+    events:
+      - http:
+          path: myevent/getAll
+          method: get
+          cors:
+            origin: ${self:custom.origin}
+            allowCredentials: true
+  eventgetdeal:
+    handler:
+      - apps/deal/router/userGet.handler
+    events:
+      - http:
+          path: event/getAlldeal/{id}
+          method: get
+          cors:
+            origin: ${self:custom.origin}
+            allowCredentials: true
+
+resources: # CloudFormation template syntax from here on.
+      Resources:
+        usersTable:
+          Type: AWS::DynamoDB::Table
+          Properties:
+            TableName: usersTable
+            AttributeDefinitions:
+              - AttributeName: email
+                AttributeType: S
+            KeySchema:
+              - AttributeName: email
+                KeyType: HASH
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
+plugins:
+  - serverless-offline
+  - serverless-middleware
