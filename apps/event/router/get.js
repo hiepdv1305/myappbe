@@ -1,14 +1,29 @@
 'use strict';
-const connectToDatabase = require("../../../init/db")
-const ev = require("../model/model")
-const { res } = require("../../../init/res");
+const { response } = require("../../../init/res");
+const db = require('../../../init/db');
+const TableName = process.env.EVENT_TABLE;
 module.exports.handler = async (event, context, callback) => {
-    await connectToDatabase();
     const id = event.pathParameters.id;
-    try {
-        const data = await ev.findById(id);
-        return res(data, 'success', 200);
-    } catch (err) {
-        return res("", err, 400);
-    }
+    return db.scan(
+        {
+            TableName: TableName,
+            FilterExpression: '#eventId = :eventId AND #status = :status',
+            ExpressionAttributeNames: {
+                '#eventId': 'eventId',
+                '#status' : 'status'
+            },
+            ExpressionAttributeValues: {
+                ':eventId': id,
+                ':status' : 'active'
+            },
+            Limit: 1
+        }
+    ).promise()
+        .then((res) => {
+            if(res.Count == 0) return response("","event not exist or finished",400)
+            return response(res, "success", 200)
+        })
+        .catch((err) => {
+            return response("", "server error", 500)
+        })
 };

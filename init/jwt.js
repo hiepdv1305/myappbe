@@ -10,9 +10,13 @@ exports.generateToken = function (user, secretSignature, tokenLife) {
   return new Promise((resolve, reject) => {
     // Định nghĩa những thông tin của user mà bạn muốn lưu vào token ở đây
     const userData = {
-      id: user._id,
+      userId: user.userId,
       username: user.username,
       role: user.role,
+      gendle: user.gendle,
+      fullname: user.fullname,
+      email:user.email,
+      phonenumber: user.phonenumber
     }
     // Thực hiện ký và tạo token
     jwt.sign(

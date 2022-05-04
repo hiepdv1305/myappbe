@@ -1,7 +1,7 @@
-module.exports.res = (data,message ,statusCode) => {
+module.exports.response = (data,message ,statusCode) => {
     return {
       headers: {
-        "Access-Control-Allow-Origin": "http://gridsomehossting.s3-website-us-east-1.amazonaws.com",
+        "Access-Control-Allow-Origin": process.env.origin,
         "Access-Control-Allow-Credentials": true,
       },
       body: JSON.stringify({
@@ -9,6 +9,5 @@ module.exports.res = (data,message ,statusCode) => {
         statusCode:statusCode,
         data
       }),
-  
     };
   }

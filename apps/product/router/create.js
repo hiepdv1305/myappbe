@@ -1,22 +1,44 @@
 'use strict';
-const connectToDatabase = require("../../../init/db")
-const product = require("../model/model")
-const { res } = require("../../../init/res");
+const { response } = require("../../../init/res");
+const db = require('../../../init/db');
+const { uuid } = require("uuidv4");
+const { convertData } = require("../../../init/convertData")
+const fields = {
+    productId: { type: String, default: uuid() },
+    productName: { type: String },
+    description: { type: String, default: '' },
+    image: { type: String },
+    status: { type: String, default: 'active' },
+    price: { type: Number },
+    createdAt: { type: Date, default: new Date().toISOString() },
+    updatedAt: { type: Date, default: new Date().toISOString() }
+};
+// const axios = require("axios");
+const TableName = process.env.PRODUCT_TABLE;
 module.exports.handler = async (event, context, callback) => {
     // let user = context.jwtDecoded;
     let user = context.prev;
+    // console.log(user.role)
     if (user.role != "admin") {
-        return res("", "no permision", 500)
+        return response("", "no permision", 500)
     } else {
-        const params = JSON.parse(event.body);
-        // console.log(params);
-        await connectToDatabase();
-        let result = await product.create(params);
-        if (result) {
-            return res(result, "succces", 200);
-        } else {
-            return res("", "error", 400)
-        }
+        let reqBody = JSON.parse(event.body);
+        let data = convertData(fields, reqBody);
+        // console.log(data)
+        return db.put(
+            {
+                TableName: TableName,
+                Item: data,
+            }
+        ).promise()
+        .then((res)=>{
+            console.log(res)
+            return response(res, "succces", 200);
+        })
+        .catch((err)=>{
+            return response("", "server error", 400)
+        })
+    
     }
 
 };

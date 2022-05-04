@@ -11,8 +11,7 @@ const {res} = require("../init/res");
  */
 
  module.exports.isAuth = async (event, context, callback) => {
-    //token có thể được kiểm tra ở body hoặc header 'x-access-token'
-    const tokenFromClient =  event.headers["Authorization"] || event.body.token ;
+    const tokenFromClient =  event.headers["Authorization"] ;
     console.log(tokenFromClient)
     if (tokenFromClient) {
         // Nếu tồn tại token

@@ -1,21 +1,32 @@
 'use strict';
-const connectToDatabase = require("../../../init/db")
-const product = require("../model/model")
-const { res } = require("../../../init/res");
+const { response } = require("../../../init/res");
+const db = require('../../../init/db');
+const TableName = process.env.PRODUCT_TABLE;
 module.exports.handler = async (event, context, callback) => {
     // let user = context.jwtDecoded;
     let user = context.prev;
     if (user.role != "admin") {
-        return res("", "no permision", 500)
+        return response("", "no permision", 500)
     } else {
         const id = event.pathParameters.id
-        await connectToDatabase();
-        try {
-            await product.findByIdAndUpdate(id, { status: "delete" });
-            return res("", "Delete Success", 200)
-        } catch (err) {
-            return res("", err, 400)
+        const params ={
+            TableName: TableName,
+            Key: {
+                productId: id,
+              },
+              UpdateExpression: 'set #status = :status',
+              ExpressionAttributeNames: {
+                "#status": "status"
+            },
+              ExpressionAttributeValues: {
+                ":status": "delete",
+              },
         }
+        return db.update(params)
+        .promise()
+        .then((res)=>{
+            return response(res,"success",200)
+        })
     }
 
 };

@@ -3,13 +3,17 @@ service: hi
 frameworkVersion: '3'
 
 custom:
-  origin: "http://gridsomehossting.s3-website-us-east-1.amazonaws.com"
-  setting:
+  settings:
+    origin: "http://gridsomehossting.s3-website-us-east-1.amazonaws.com"
     USER_TABLE: usersTable
+    PRODUCT_TABLE: productsTable
+    EVENT_TABLE: eventsTable
+    DEAL_TABLE: dealsTable
 provider:
   name: aws
   runtime: nodejs14.x
   region: us-east-1
+  environment: ${self:custom.settings}
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -22,6 +26,9 @@ provider:
         - dynamodb:DeleteItem
       Resource:
         - 'arn:aws:dynamodb:${self:provider.region}:*:table/${self:custom.settings.USER_TABLE}'
+        - 'arn:aws:dynamodb:${self:provider.region}:*:table/${self:custom.settings.PRODUCT_TABLE}'
+        - 'arn:aws:dynamodb:${self:provider.region}:*:table/${self:custom.settings.EVENT_TABLE}'
+        - 'arn:aws:dynamodb:${self:provider.region}:*:table/${self:custom.settings.DEAL_TABLE}'
 
 functions:
   hello:
@@ -33,7 +40,7 @@ functions:
           path: login
           method: post
           cors:
-            origin: ${self:custom.origin}
+            origin: ${self:custom.settings.origin}
             allowCredentials: true
   register:
     handler: apps/user/router/register.handler
@@ -42,7 +49,7 @@ functions:
           path: register
           method: post
           cors:
-            origin: ${self:custom.origin}
+            origin: ${self:custom.settings.origin}
             allowCredentials: true
 #product
   createproduct:
@@ -56,7 +63,7 @@ functions:
           path: product/create
           method: post
           cors:
-            origin: ${self:custom.origin}
+            origin: ${self:custom.settings.origin}
             allowCredentials: true
   updateproduct:
     handler:
@@ -69,7 +76,7 @@ functions:
           path: product/update/{id}
           method: put
           cors:
-            origin: ${self:custom.origin}
+            origin: ${self:custom.settings.origin}
             allowCredentials: true
   deleteproduct:
     handler:
@@ -82,7 +89,7 @@ functions:
           path: product/delete/{id}
           method: put
           cors:
-            origin: ${self:custom.origin}
+            origin: ${self:custom.settings.origin}
             allowCredentials: true
   getproduct:
     handler:
@@ -92,7 +99,7 @@ functions:
           path: product/get/{id}
           method: get
           cors:
-            origin: ${self:custom.origin}
+            origin: ${self:custom.settings.origin}
             allowCredentials: true
   getallproduct:
     handler:
@@ -102,7 +109,7 @@ functions:
           path: product/getAll
           method: get
           cors:
-            origin: ${self:custom.origin}
+            origin: ${self:custom.settings.origin}
             allowCredentials: true
 #event
   createevent:
@@ -116,7 +123,7 @@ functions:
           path: event/create
           method: post
           cors:
-            origin: ${self:custom.origin}
+            origin: ${self:custom.settings.origin}
             allowCredentials: true
   updateevent:
     handler:
@@ -129,7 +136,7 @@ functions:
           path: event/update/{id}
           method: put
           cors:
-            origin: ${self:custom.origin}
+            origin: ${self:custom.settings.origin}
             allowCredentials: true
   deleteevent:
     handler:
@@ -142,7 +149,7 @@ functions:
           path: event/delete/{id}
           method: put
           cors:
-            origin: ${self:custom.origin}
+            origin: ${self:custom.settings.origin}
             allowCredentials: true
   getevent:
     handler:
@@ -152,7 +159,7 @@ functions:
           path: event/get/{id}
           method: get
           cors:
-            origin: ${self:custom.origin}
+            origin: ${self:custom.settings.origin}
             allowCredentials: true
   getallevent:
     handler:
@@ -162,7 +169,7 @@ functions:
           path: event/getAll
           method: get
           cors:
-            origin: ${self:custom.origin}
+            origin: ${self:custom.settings.origin}
             allowCredentials: true
 
 #deal
@@ -177,7 +184,7 @@ functions:
           path: deal/create
           method: post
           cors:
-            origin: ${self:custom.origin}
+            origin: ${self:custom.settings.origin}
             allowCredentials: true
   usergetdeal:
     handler:
@@ -190,17 +197,17 @@ functions:
           path: myevent/getAll
           method: get
           cors:
-            origin: ${self:custom.origin}
+            origin: ${self:custom.settings.origin}
             allowCredentials: true
   eventgetdeal:
     handler:
-      - apps/deal/router/userGet.handler
+      - apps/deal/router/eventGet.handler
     events:
       - http:
           path: event/getAlldeal/{id}
           method: get
           cors:
-            origin: ${self:custom.origin}
+            origin: ${self:custom.settings.origin}
             allowCredentials: true
 
 resources: # CloudFormation template syntax from here on.
@@ -210,10 +217,49 @@ resources: # CloudFormation template syntax from here on.
           Properties:
             TableName: usersTable
             AttributeDefinitions:
-              - AttributeName: email
+              - AttributeName: username
                 AttributeType: S
             KeySchema:
-              - AttributeName: email
+              - AttributeName: username
+                KeyType: HASH
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
+        productTable:
+          Type: AWS::DynamoDB::Table
+          Properties:
+            TableName: productsTable
+            AttributeDefinitions:
+              - AttributeName: productId
+                AttributeType: S
+            KeySchema:
+              - AttributeName: productId
+                KeyType: HASH
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
+        eventTable:
+          Type: AWS::DynamoDB::Table
+          Properties:
+            TableName: eventsTable
+            AttributeDefinitions:
+              - AttributeName: eventId
+                AttributeType: S
+            KeySchema:
+              - AttributeName: eventId
+                KeyType: HASH
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
+        dealTable:
+          Type: AWS::DynamoDB::Table
+          Properties:
+            TableName: dealsTable
+            AttributeDefinitions:
+              - AttributeName: dealId
+                AttributeType: S
+            KeySchema:
+              - AttributeName: dealId
                 KeyType: HASH
             ProvisionedThroughput:
               ReadCapacityUnits: 1

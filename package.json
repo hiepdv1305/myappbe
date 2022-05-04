@@ -11,7 +11,8 @@
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "jsonwebtoken": "^8.5.1",
-    "mongoose": "^6.2.10"
+    "mongoose": "^6.2.10",
+    "uuidv4": "^6.2.13"
   },
   "devDependencies": {
     "serverless-middleware": "^2.0.0",
