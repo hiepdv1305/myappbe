@@ -4,7 +4,7 @@ frameworkVersion: '3'
 
 custom:
   settings:
-    origin: "http://gridsomehossting.s3-website-us-east-1.amazonaws.com"
+    origin: "http://localhost:8080"
     USER_TABLE: usersTable
     PRODUCT_TABLE: productsTable
     EVENT_TABLE: eventsTable

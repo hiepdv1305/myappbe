@@ -15,8 +15,7 @@ module.exports.handler = async (event, context, callback) => {
             ExpressionAttributeValues: {
                 ':eventId': id,
                 ':status' : 'active'
-            },
-            Limit: 1
+            }
         }
     ).promise()
         .then((res) => {
