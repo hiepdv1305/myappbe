@@ -4,7 +4,7 @@ frameworkVersion: '3'
 
 custom:
   settings:
-    origin: "http://localhost:8080"
+    origin: "http://localhost:3000"
     USER_TABLE: usersTable
     PRODUCT_TABLE: productsTable
     EVENT_TABLE: eventsTable
@@ -209,6 +209,16 @@ functions:
           cors:
             origin: ${self:custom.settings.origin}
             allowCredentials: true
+  momopayment:
+    handler:
+      - momopayment/momo.handler
+    events:
+      - http:
+          path: momopayment
+          method: post
+          cors:
+            origin: ${self:custom.settings.origin}
+            allowCredentials: true          
 
 resources: # CloudFormation template syntax from here on.
       Resources:
