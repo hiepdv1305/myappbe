@@ -9,6 +9,7 @@ custom:
     PRODUCT_TABLE: productsTable
     EVENT_TABLE: eventsTable
     DEAL_TABLE: dealsTable
+    RECHANGE_TABLE: rechangeTable
 provider:
   name: aws
   runtime: nodejs14.x
@@ -29,6 +30,7 @@ provider:
         - 'arn:aws:dynamodb:${self:provider.region}:*:table/${self:custom.settings.PRODUCT_TABLE}'
         - 'arn:aws:dynamodb:${self:provider.region}:*:table/${self:custom.settings.EVENT_TABLE}'
         - 'arn:aws:dynamodb:${self:provider.region}:*:table/${self:custom.settings.DEAL_TABLE}'
+        - 'arn:aws:dynamodb:${self:provider.region}:*:table/${self:custom.settings.RECHANGE_TABLE}'
 
 functions:
   hello:
@@ -218,7 +220,29 @@ functions:
           method: post
           cors:
             origin: ${self:custom.settings.origin}
-            allowCredentials: true          
+            allowCredentials: true
+  sendemail:
+    handler: email/email.handler
+    events:
+      - http:
+          path: email
+          method: post
+          cors:
+            origin: ${self:custom.settings.origin}
+            allowCredentials: true
+  rechangeCreate:
+    handler:
+      - apps/rechange/create.handler
+    middleware:
+      pre:
+        - middleware/authenication.isAuth
+    events:
+      - http:
+          path: rechange/create
+          method: post
+          cors:
+            origin: ${self:custom.settings.origin}
+            allowCredentials: true  
 
 resources: # CloudFormation template syntax from here on.
       Resources:
@@ -270,6 +294,19 @@ resources: # CloudFormation template syntax from here on.
                 AttributeType: S
             KeySchema:
               - AttributeName: dealId
+                KeyType: HASH
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
+        rechangeTable:
+          Type: AWS::DynamoDB::Table
+          Properties:
+            TableName: rechangeTable
+            AttributeDefinitions:
+              - AttributeName: rechangeId
+                AttributeType: S
+            KeySchema:
+              - AttributeName: rechangeId
                 KeyType: HASH
             ProvisionedThroughput:
               ReadCapacityUnits: 1
