@@ -14,6 +14,7 @@ const fields = {
 };
 // const axios = require("axios");
 const TableName = process.env.RECHANGE_TABLE;
+const UserTable = process.env.USER_TABLE
 module.exports.handler = async (event, context, callback) => {
     let user = context.prev;
     let reqBody = JSON.parse(event.body);
@@ -31,7 +32,7 @@ module.exports.handler = async (event, context, callback) => {
         },
     }).promise()
         .then(res => {
-            if (res.Count == 0) return response("", "product not exist")
+            if (res.Count == 0) return response("", "rechange not exist")
             const item = JSON.parse(event.body);
             let updateExpression = 'set';
             let ExpressionAttributeNames = {};

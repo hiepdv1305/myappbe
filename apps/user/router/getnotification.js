@@ -9,10 +9,13 @@ module.exports.handler = async (event, context, callback) => {
   let key = 'notification' + user.userId;
   key = md5(key);
   let params = {
-    Bucket: `runtime-cococas`,
-    Key: key.json
+    Bucket: `apptmdt`,
+    Key: `notification/${key.slice(0, 2)}/${key.slice(
+      2,
+      4
+    )}/${key.slice(4, 6)}/${key.slice(6)}.json`,
   };
   const getData = await s3.getObject(params).promise();
   console.log(getData.Body.toString("utf-8"));
-  return response(getData,"success",200);
+  return response(getData, "success", 200);
 };

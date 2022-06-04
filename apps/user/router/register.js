@@ -8,7 +8,8 @@ const fields = {
     userId: { type: String, default: uuid() },
     username: { type: String },
     password: { type: String },
-    role:{ type: String, default: 'user' },
+    role: { type: String, default: 'user' },
+    amout: { type: Number, default: 0 },
     fullname: { type: String, default: '' },
     phonenumber: { type: String, default: '' },
     email: { type: String, default: '' },
@@ -34,7 +35,7 @@ module.exports.handler = async (event, context, callback) => {
             ':username': data.username,
         },
     }
-    return db.scan(params).promise().then((res)=>{
+    return db.scan(params).promise().then((res) => {
         console.log(res)
         if (res.Count > 0) {
             console.log(1)
@@ -44,14 +45,14 @@ module.exports.handler = async (event, context, callback) => {
                 TableName: TableName,
                 Item: data,
             }).promise()
-            .then(()=>{
-               return response("", "success", 200) 
-            })
+                .then(() => {
+                    return response("", "success", 200)
+                })
         }
-    }).catch((err)=>{
-        
+    }).catch((err) => {
+
         console.log(err)
-        return res("", "server error",500);
+        return res("", "server error", 500);
     })
 
 };
