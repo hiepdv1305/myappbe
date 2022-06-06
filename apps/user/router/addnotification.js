@@ -1,7 +1,7 @@
 const aws = require("aws-sdk");
 const s3 = new aws.S3();
 var md5 = require("md5");
-module.exports.addNotification = (userId, data) => {
+module.exports.addNotification = async (userId, data) => {
 
     try {
         let key = 'notification' + userId;

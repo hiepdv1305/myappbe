@@ -1,6 +1,6 @@
 service: hi
 
-frameworkVersion: '3'
+frameworkVersion: "3"
 
 custom:
   settings:
@@ -26,11 +26,11 @@ provider:
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
       Resource:
-        - 'arn:aws:dynamodb:${self:provider.region}:*:table/${self:custom.settings.USER_TABLE}'
-        - 'arn:aws:dynamodb:${self:provider.region}:*:table/${self:custom.settings.PRODUCT_TABLE}'
-        - 'arn:aws:dynamodb:${self:provider.region}:*:table/${self:custom.settings.EVENT_TABLE}'
-        - 'arn:aws:dynamodb:${self:provider.region}:*:table/${self:custom.settings.DEAL_TABLE}'
-        - 'arn:aws:dynamodb:${self:provider.region}:*:table/${self:custom.settings.RECHANGE_TABLE}'
+        - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:custom.settings.USER_TABLE}"
+        - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:custom.settings.PRODUCT_TABLE}"
+        - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:custom.settings.EVENT_TABLE}"
+        - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:custom.settings.DEAL_TABLE}"
+        - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:custom.settings.RECHANGE_TABLE}"
 
 functions:
   hello:
@@ -53,7 +53,7 @@ functions:
           cors:
             origin: ${self:custom.settings.origin}
             allowCredentials: true
-#product
+  #product
   createproduct:
     handler:
       - apps/product/router/create.handler
@@ -113,7 +113,7 @@ functions:
           cors:
             origin: ${self:custom.settings.origin}
             allowCredentials: true
-#event
+  #event
   createevent:
     handler:
       - apps/event/router/create.handler
@@ -174,7 +174,7 @@ functions:
             origin: ${self:custom.settings.origin}
             allowCredentials: true
 
-#deal
+  #deal
   createdeal:
     handler:
       - apps/deal/router/createDeal.handler
@@ -242,75 +242,85 @@ functions:
           method: post
           cors:
             origin: ${self:custom.settings.origin}
-            allowCredentials: true  
+            allowCredentials: true
+  spin:
+    handler:
+      - apps/event/router/spin.handler
+    events:
+      - http:
+          path: event/spin
+          method: get
+          cors:
+            origin: ${self:custom.settings.origin}
+            allowCredentials: true
 
 resources: # CloudFormation template syntax from here on.
-      Resources:
-        usersTable:
-          Type: AWS::DynamoDB::Table
-          Properties:
-            TableName: usersTable
-            AttributeDefinitions:
-              - AttributeName: username
-                AttributeType: S
-            KeySchema:
-              - AttributeName: username
-                KeyType: HASH
-            ProvisionedThroughput:
-              ReadCapacityUnits: 1
-              WriteCapacityUnits: 1
-        productTable:
-          Type: AWS::DynamoDB::Table
-          Properties:
-            TableName: productsTable
-            AttributeDefinitions:
-              - AttributeName: productId
-                AttributeType: S
-            KeySchema:
-              - AttributeName: productId
-                KeyType: HASH
-            ProvisionedThroughput:
-              ReadCapacityUnits: 1
-              WriteCapacityUnits: 1
-        eventTable:
-          Type: AWS::DynamoDB::Table
-          Properties:
-            TableName: eventsTable
-            AttributeDefinitions:
-              - AttributeName: eventId
-                AttributeType: S
-            KeySchema:
-              - AttributeName: eventId
-                KeyType: HASH
-            ProvisionedThroughput:
-              ReadCapacityUnits: 1
-              WriteCapacityUnits: 1
-        dealTable:
-          Type: AWS::DynamoDB::Table
-          Properties:
-            TableName: dealsTable
-            AttributeDefinitions:
-              - AttributeName: dealId
-                AttributeType: S
-            KeySchema:
-              - AttributeName: dealId
-                KeyType: HASH
-            ProvisionedThroughput:
-              ReadCapacityUnits: 1
-              WriteCapacityUnits: 1
-        rechangeTable:
-          Type: AWS::DynamoDB::Table
-          Properties:
-            TableName: rechangeTable
-            AttributeDefinitions:
-              - AttributeName: rechangeId
-                AttributeType: S
-            KeySchema:
-              - AttributeName: rechangeId
-                KeyType: HASH
-            ProvisionedThroughput:
-              ReadCapacityUnits: 1
-              WriteCapacityUnits: 1
+  Resources:
+    usersTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: usersTable
+        AttributeDefinitions:
+          - AttributeName: username
+            AttributeType: S
+        KeySchema:
+          - AttributeName: username
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+    productTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: productsTable
+        AttributeDefinitions:
+          - AttributeName: productId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: productId
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+    eventTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: eventsTable
+        AttributeDefinitions:
+          - AttributeName: eventId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: eventId
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+    dealTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: dealsTable
+        AttributeDefinitions:
+          - AttributeName: dealId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: dealId
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+    rechangeTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: rechangeTable
+        AttributeDefinitions:
+          - AttributeName: rechangeId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: rechangeId
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
 plugins:
   - serverless-offline
   - serverless-middleware

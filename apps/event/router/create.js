@@ -27,21 +27,21 @@ module.exports.handler = async (event, context, callback) => {
     } else {
         let reqBody = JSON.parse(event.body);
         let data = convertData(fields, reqBody);
-        // console.log(data)
+        console.log(data)
         return db.put(
             {
                 TableName: TableName,
                 Item: data,
             }
         ).promise()
-        .then((res)=>{
-            console.log(res)
-            return response(res, "succces", 200);
-        })
-        .catch((err)=>{
-            return response("", "server error", 400)
-        })
-    
+            .then((res) => {
+                console.log(res)
+                return response(res, "succces", 200);
+            })
+            .catch((err) => {
+                return response("", "server error", 400)
+            })
+
     }
 
 };
