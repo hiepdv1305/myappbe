@@ -7,14 +7,12 @@ module.exports.handler = async (event, context, callback) => {
     return db.scan(
         {
             TableName: TableName,
-            FilterExpression: '#eventId = :eventId AND #status = :status',
+            FilterExpression: '#eventId = :eventId',
             ExpressionAttributeNames: {
                 '#eventId': 'eventId',
-                '#status' : 'status'
             },
             ExpressionAttributeValues: {
                 ':eventId': id,
-                ':status' : 'active'
             }
         }
     ).promise()

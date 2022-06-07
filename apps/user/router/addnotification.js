@@ -12,7 +12,7 @@ module.exports.addNotification = async (userId, data) => {
                 2,
                 4
             )}/${key.slice(4, 6)}/${key.slice(6)}.json`,
-            Body: data
+            Body: JSON.stringify(data, null, 2),
         };
         await s3.putObject(params, function (err, data) {
             if (err) {

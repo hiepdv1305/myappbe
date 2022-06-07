@@ -12,7 +12,6 @@ const fields = {
     createdAt: { type: Date, default: new Date().toISOString() },
     updatedAt: { type: Date, default: new Date().toISOString() }
 };
-// const axios = require("axios");
 const TableName = process.env.RECHANGE_TABLE;
 const UserTable = process.env.USER_TABLE
 module.exports.handler = async (event, context, callback) => {
@@ -20,42 +19,59 @@ module.exports.handler = async (event, context, callback) => {
     let reqBody = JSON.parse(event.body);
     let data = convertData(fields, reqBody);
     // console.log(data)
-    const id = event.pathParameters.id;
     return db.scan({
         TableName: TableName,
-        FilterExpression: '#productId = :productId',
+        FilterExpression: '#rechangeId = :rechangeId',
         ExpressionAttributeNames: {
-            '#productId': 'productId',
+            '#rechangeId': 'rechangeId',
         },
         ExpressionAttributeValues: {
-            ':productId': id,
+            ':rechangeId': data.rechangeId,
         },
     }).promise()
         .then(res => {
             if (res.Count == 0) return response("", "rechange not exist")
-            const item = JSON.parse(event.body);
-            let updateExpression = 'set';
-            let ExpressionAttributeNames = {};
-            let ExpressionAttributeValues = {};
-            for (const property in item) {
-                updateExpression += ` #${property} = :${property} ,`;
-                ExpressionAttributeNames['#' + property] = property;
-                ExpressionAttributeValues[':' + property] = item[property];
-            }
-            updateExpression = updateExpression.slice(0, -1);
-            const params = {
-                TableName: TableName,
+                const item = JSON.parse(event.body);
+                delete item["rechangeId"]
+                let updateExpression = 'set';
+                let ExpressionAttributeNames = {};
+                let ExpressionAttributeValues = {};
+                for (const property in item) {
+                    updateExpression += ` #${property} = :${property} ,`;
+                    ExpressionAttributeNames['#' + property] = property;
+                    ExpressionAttributeValues[':' + property] = item[property];
+                }
+                updateExpression += ` #status = :status ,`;
+                ExpressionAttributeNames['#status'] = 'status';
+                ExpressionAttributeValues[':status'] = 'thành công';
+                updateExpression = updateExpression.slice(0, -1);
+                const params = {
+                    TableName: TableName,
+                    Key: {
+                        rechangeId: data.rechangeId,
+                    },
+                    UpdateExpression: updateExpression,
+                    ExpressionAttributeNames: ExpressionAttributeNames,
+                    ExpressionAttributeValues: ExpressionAttributeValues
+                };
+                db.update(params).promise()
+                    .then((res) => {
+                        return response(res, "success", 200)
+                    })
+            db.update({
+                TableName: UserTable,
                 Key: {
-                    productId: id,
+                    rechangeId: user.userId,
+                  },
+                  UpdateExpression: 'set #amout = :amout',
+                  ExpressionAttributeNames: {
+                    "#amout": "amout"
                 },
-                UpdateExpression: updateExpression,
-                ExpressionAttributeNames: ExpressionAttributeNames,
-                ExpressionAttributeValues: ExpressionAttributeValues
-            };
-            return db.update(params).promise()
-                .then((res) => {
-                    return response(res, "success", 200)
-                })
+                  ExpressionAttributeValues: {
+                    ":amout": data.rechange,
+                  },
+            })
+            return response('', 'thanh cong', 200)
         })
         .catch(err => {
             return response("", err, 500)

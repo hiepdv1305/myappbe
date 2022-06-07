@@ -12,7 +12,6 @@ const {res} = require("../init/res");
 
  module.exports.isAuth = async (event, context, callback) => {
     const tokenFromClient =  event.headers["Authorization"] ;
-    console.log(tokenFromClient)
     if (tokenFromClient) {
         // Nếu tồn tại token
         try {

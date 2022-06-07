@@ -13,6 +13,7 @@ const fields = {
     price: { type: Number },
     currentPoint: { type: Number, default: 0 },
     totalPoint: { type: Number },
+    winner: { type: String, default: null },
     createdAt: { type: Date, default: new Date().toISOString() },
     updatedAt: { type: Date, default: new Date().toISOString() }
 };

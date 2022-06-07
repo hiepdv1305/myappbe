@@ -4,7 +4,7 @@ frameworkVersion: "3"
 
 custom:
   settings:
-    origin: "http://localhost:3000"
+    origin: "http://localhost:8080"
     USER_TABLE: usersTable
     PRODUCT_TABLE: productsTable
     EVENT_TABLE: eventsTable
@@ -243,16 +243,37 @@ functions:
           cors:
             origin: ${self:custom.settings.origin}
             allowCredentials: true
-  spin:
+  updateRechange:
     handler:
-      - apps/event/router/spin.handler
+      - apps/rechange/changeResult.handler
+    middleware:
+      pre:
+        - middleware/authenication.isAuth
     events:
       - http:
-          path: event/spin
+          path: rechange/update
+          method: post
+          cors:
+            origin: ${self:custom.settings.origin}
+            allowCredentials: true
+  getNotification:
+    handler:
+      - apps/user/router/getnotification.handler
+    middleware:
+      pre:
+        - middleware/authenication.isAuth
+    events:
+      - http:
+          path: user/getNotification
           method: get
           cors:
             origin: ${self:custom.settings.origin}
             allowCredentials: true
+  spin:
+    handler:
+      - apps/event/router/spin.handler
+    events:
+      - schedule: rate(1 minute)
 
 resources: # CloudFormation template syntax from here on.
   Resources:
